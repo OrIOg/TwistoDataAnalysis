@@ -1,10 +1,12 @@
 import twitter
 import sqlite3
 import utilities
+import os.path
 
 DROP = False
 
 credentials = utilities.get_credentials()
+DROP = DROP or not os.path.exists('twisto_tweets.db')
 db = sqlite3.connect('twisto_tweets.db')
 
 if DROP:
@@ -27,16 +29,24 @@ def writemany(db: sqlite3.Connection, objs: twitter.models.Status):
 
 last_id = None
 
-try:
-    for status_id in db.execute("SELECT id FROM tweets ORDER BY time ASC LIMIT 1;"):
-        last_id = int(status_id[0])-1
-except:
-    pass
+if not DROP:
+	try:
+		for status_id in db.execute("SELECT id FROM tweets ORDER BY time ASC LIMIT 1;"):
+			last_id = int(status_id[0])-1
+	except:
+		pass
 
+total = 0
 while True:
-    results = api.GetUserTimeline(screen_name="TwistoCaen", count=200, trim_user=True, include_rts=False, max_id=last_id if last_id else None)
-    last_id = results[-1].id-1
-    writemany(db, results)
+	results = api.GetUserTimeline(screen_name="TwistoCaen", count=200, trim_user=True, include_rts=False, max_id=last_id if last_id else None)
+	if results:
+		last_id = results[-1].id-1
+		writemany(db, results)
+		print(f'Got {len(results)} new tweets')
+		total += len(results)
+	else:
+		print(f'Done, got a total of {total} tweets')
+		break
 
 db.close()
 exit(0)

@@ -5,7 +5,7 @@ __ApiKey = "ApiKey"
 __ApiKeySecret = "ApiKeySecret"
 
 __CONFIG_INI_PATH = "config.ini"
-__CONFIG_DEFAULT = f"[{__Credentials}]\nf{__ApiKey} = PUT_YOUR_TOKEN_HERE\nf{__ApiKeySecret} = PUT_YOUR_TOKEN_HERE"
+__CONFIG_DEFAULT = f"[{__Credentials}]\n{__ApiKey} = PUT_YOUR_TOKEN_HERE\n{__ApiKeySecret} = PUT_YOUR_TOKEN_HERE"
 __INVALID_DATA = ('', 'PUT_YOUR_TOKEN_HERE')
 
 def get_credentials():
@@ -23,3 +23,6 @@ def get_credentials():
         pass
 
     raise ValueError("Please, configure your credentials correctly => config.ini\n", __CONFIG_DEFAULT)
+
+if __name__ == '__main__':
+	get_credentials()
